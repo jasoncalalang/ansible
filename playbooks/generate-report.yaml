@@ -17,6 +17,7 @@
         {{ scap_content }}
       register: scap_eval_result
       changed_when: false
+      ignore_errors: true
 
     - name: Fetch the HTML report to the Ansible control node
       ansible.builtin.fetch:
