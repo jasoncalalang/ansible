@@ -9,5 +9,8 @@
     - name: Apply remediation
       import_playbook: remediate.yaml
 
+    - name: Apply SCAP remediation
+      import_playbook: remediate-scap.yaml
+
     - name: Generate the report
-      import_playbook: remediate.yaml
+      import_playbook: generate-report.yaml
