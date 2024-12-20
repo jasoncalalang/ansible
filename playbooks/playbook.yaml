@@ -1,0 +1,13 @@
+---
+- name: Master playbook to chain multiple playbooks
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update packages and install OpenSCAP
+      import_playbook: init.yaml
+
+    - name: Apply remediation
+      import_playbook: remediate.yaml
+
+    - name: Generate the report
+      import_playbook: remediate.yaml

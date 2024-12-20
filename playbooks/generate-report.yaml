@@ -1,0 +1,29 @@
+---
+- name: Run SCAP Level 2 RHEL report and fetch it
+  hosts: all
+  become: yes
+  vars:
+    # Variables for filenames and paths
+    scap_profile: "xccdf_org.ssgproject.content_profile_cis_server_l2"
+    scap_content: "/usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml"
+    scap_html_report: "/tmp/rhel9-cis-level2-report.html"
+
+  tasks:
+    - name: Run SCAP Level 2 evaluation and generate HTML report
+      ansible.builtin.command: >
+        oscap xccdf eval
+        --profile {{ scap_profile }}
+        --report {{ scap_html_report }}
+        {{ scap_content }}
+      register: scap_eval_result
+      changed_when: false
+
+    - name: Display SCAP evaluation stdout for debugging
+      ansible.builtin.debug:
+        msg: "{{ scap_eval_result.stdout }}"
+
+    - name: Fetch the HTML report to the Ansible control node
+      ansible.builtin.fetch:
+        src: "{{ scap_html_report }}"
+        dest: "./reports/rhel9-cis-level2-report.html"
+        flat: yes
