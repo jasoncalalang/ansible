@@ -8,6 +8,16 @@
         name: "*"
         state: latest
 
+    - name: Create a non-root user with sudo privileges
+      ansible.builtin.user:
+        name: user1
+        shell: /bin/bash
+        groups: wheel
+        # Replace the hash below with one you generate for P@ssw0rd@IBM
+        password: "$6$rounds=4096$vnNxhKrVTlGiRXtK$CeCUJmD73KPhgFsCtvf7Gjw.llm8HWhKpUZAXkmg.smoNtzTc5ekbM4qXP8qOzBOaOHKjQ.gJrBSq5/7DmOiN/"
+        state: present
+        create_home: yes
+
     - name: Install OpenSCAP and SCAP Security Guide
       ansible.builtin.yum:
         name:
