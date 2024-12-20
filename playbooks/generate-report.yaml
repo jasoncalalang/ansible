@@ -4,7 +4,7 @@
   become: yes
   vars:
     # Variables for filenames and paths
-    scap_profile: "xccdf_org.ssgproject.content_profile_cis_server_l2"
+    scap_profile: "xccdf_org.ssgproject.content_profile_cis"
     scap_content: "/usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml"
     scap_html_report: "/tmp/rhel9-cis-level2-report.html"
 
