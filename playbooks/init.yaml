@@ -14,7 +14,7 @@
         shell: /bin/bash
         groups: wheel
         # Replace the hash below with one you generate for P@ssw0rd@IBM
-        password: "$6$rounds=4096$vnNxhKrVTlGiRXtK$CeCUJmD73KPhgFsCtvf7Gjw.llm8HWhKpUZAXkmg.smoNtzTc5ekbM4qXP8qOzBOaOHKjQ.gJrBSq5/7DmOiN/"
+        password: "$6$ThiIK8enApAcAI6P$PVAjhaAF9OUPNZx6/8YopsKeWf5V4rpNOTLlNocre2xkDrfvxCHAac/VFoMmi4wiV9IXWa5sh70FEBS/99.ky/"
         state: present
         create_home: yes
 
