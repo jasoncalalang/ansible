@@ -18,6 +18,20 @@
         state: present
         create_home: yes
 
+    - name: Ensure .ssh directory exists for user1
+      ansible.builtin.file:
+        path: /home/user1/.ssh
+        state: directory
+        mode: '0700'
+        owner: user1
+        group: user1
+
+    - name: Add SSH key to authorized_keys for user1
+      ansible.builtin.authorized_key:
+        user: user1
+        state: present
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCeK6wARzHAI8YaRMPIg1ymkIl6TD0aq1gTYCswpc6vr2QN1XmoVtYxZGMiNypldl5ouzZW7h4fSqigbSOY7zJy7IqmGTcRLDhXTQYNAf4l3oXpqNhPetl3fEkqyh46LRS24+6No+7mwCWc1ilFwyZYS1MKVBLjg1a4HOxaYg8Fl1ysyhEOzLI40pT9K17LOEtRMD6uAjTwMzwQ6GolL07IfKejnv6Dd2u6mp/VbBIoCznBDFTrNBkPbIFFEbNbWe8evMMqY+cGOY+Zv6wwkTMEB4FXbdbmaBMgbtM6ONCwNeJyU+qin7WUAwI2mLttY8cXl1UgtHs+1d+cnYjzGch41tavPuWZu45v5jgWhUHYDABCdlbLf3ODGNbM2Tafvzx6zJQcUQ9obDkSpDpfnb/bPBMa2H/7LtGG2mn/IUW8N5ZCQ54Ge/PNOYpwjWBTJG4zb1Z2AnysSd3VmoAM8LCXohcNxE9EBpDN4AotXMiZIPqx1PwQNLX71Pr8FIqnxG5LTtpeZzAIy9bXOmBQn4xtOQSD3TVu0zj9Yf8Cz2ODkMFfHXwsFcS2kU9zTTiPIQY82aSVGRiWe3FvOaMYD8EzlKECm4w5pi0mY4Yp1NDJeK5BSR6aV9QlV0wLel48OQr93BJyViEbAZmKiVnQZxYgPi1fr3tFr4bzVd1l/AdR2w== jcalalang@ph.ibm.com"
+
     - name: Install OpenSCAP and SCAP Security Guide
       ansible.builtin.yum:
         name:
