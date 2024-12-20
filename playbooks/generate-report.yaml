@@ -18,10 +18,6 @@
       register: scap_eval_result
       changed_when: false
 
-    - name: Display SCAP evaluation stdout for debugging
-      ansible.builtin.debug:
-        msg: "{{ scap_eval_result.stdout }}"
-
     - name: Fetch the HTML report to the Ansible control node
       ansible.builtin.fetch:
         src: "{{ scap_html_report }}"
