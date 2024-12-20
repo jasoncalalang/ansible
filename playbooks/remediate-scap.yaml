@@ -41,7 +41,7 @@
     # 3. grub2_password
     # First, generate a hashed password using grub2-mkpasswd-pbkdf2.
     - name: Generate grub2 password hash
-      command: "/usr/bin/grub2-mkpasswd-pbkdf2/grub2-mkpasswd-pbkdf2 --password={{ grub2_plain_password }}"
+      command: "/usr/bin/grub2-mkpasswd-pbkdf2 --password={{ grub2_plain_password }}"
       register: grub2pw
       # no_log: true
 
