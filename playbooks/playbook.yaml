@@ -3,14 +3,17 @@
   hosts: all
   become: yes
   tasks:
+    - name: Mount volumes
+      import_playbook: mount-volumes.yaml
+
     - name: Update packages and install OpenSCAP
-      import_tasks: init.yaml
+      import_playbook: init.yaml
+    
+    # - name: Apply remediation
+    #   import_tasks: remediate.yaml
 
-    - name: Apply remediation
-      import_tasks: remediate.yaml
+    # - name: Apply SCAP remediation
+    #   import_tasks: remediate-scap.yaml
 
-    - name: Apply SCAP remediation
-      import_tasks: remediate-scap.yaml
-
-    - name: Generate the report
-      import_tasks: generate-report.yaml
+    # - name: Generate the report
+    #   import_tasks: generate-report.yaml
