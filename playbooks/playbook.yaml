@@ -1,6 +1,6 @@
 ---
 - import_playbook: mount-volumes.yaml
 - import_playbook: init.yaml
-# - import_playbook: remediate.yaml
+- import_playbook: remediate.yaml
 # - import_playbook: remediate-scap.yaml
 # - import_playbook: generate-report.yaml
