@@ -26,7 +26,7 @@
         opts: "defaults,nodev,nosuid,noexec"
 
   tasks:
-    - name: Check if device is already partitioned
+    - name: Check if devices are already partitioned
       command: "lsblk -n -o NAME {{ item.device | basename }}1"
       register: partition_check
       failed_when: false
@@ -34,7 +34,7 @@
       with_items: "{{ volumes }}"
       when: item.filesystem != "tmpfs"
 
-    - name: Partition the volume if not already partitioned
+    - name: Partition the volumes if not already partitioned
       shell: |
         echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}
       args:
