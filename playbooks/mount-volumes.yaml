@@ -1,5 +1,5 @@
 ---
-- name: Force mount volumes to specified mount points
+- name: Prepare and mount volumes
   hosts: all
   become: yes
   vars:
@@ -38,6 +38,25 @@
         group: root
         mode: "0755"
       with_items: "{{ volumes }}"
+
+    - name: Create a partition if not already partitioned
+      shell: |
+        echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}
+      args:
+        executable: /bin/bash
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
+      register: partition_result
+      failed_when: false
+
+    - name: Format the partition if not already formatted
+      filesystem:
+        dev: "{{ item.device }}1"
+        fstype: "{{ item.filesystem }}"
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
+      register: format_result
+      failed_when: false
 
     - name: Mount the volume (force overwrite existing mount point)
       mount:
