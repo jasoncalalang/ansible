@@ -27,14 +27,16 @@
 
   tasks:
     - name: Partition the volume if not already partitioned
-      command: "echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}"
+      shell: |
+        echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}
+        lsblk -o NAME,TYPE | grep -q "{{ item.device | basename }}1"
       args:
         warn: false
+        executable: /bin/bash
       when: item.filesystem != "tmpfs"
       with_items: "{{ volumes }}"
       register: partition_result
-      failed_when: "'already contains a partition table' not in partition_result.stdout"
-      changed_when: "'already contains a partition table' not in partition_result.stdout"
+      changed_when: "'already contains a partition table' not in partition_result.stderr and 'created new partition' in partition_result.stdout"
 
     - name: Format the volume if not already formatted
       filesystem:
