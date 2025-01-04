@@ -1,0 +1,79 @@
+---
+- name: Partition, format, and mount disks
+  hosts: all
+  become: yes
+  vars:
+    volumes:
+      - device: "/dev/vdb"
+        mount_point: "/home"
+        filesystem: "ext4"
+        opts: "defaults,nodev"
+      - device: "/dev/vdc"
+        mount_point: "/tmp"
+        filesystem: "ext4"
+        opts: "defaults,nodev,nosuid,noexec"
+      - device: "/dev/vdd"
+        mount_point: "/var"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vde"
+        mount_point: "/var/log"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdf"
+        mount_point: "/var/log/audit"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdg"
+        mount_point: "/var/tmp"
+        filesystem: "ext4"
+        opts: "defaults,nodev,nosuid,noexec"
+      - device: "/dev/vdh"
+        mount_point: "/dev/shm"
+        filesystem: "tmpfs"
+        opts: "defaults,nodev,nosuid,noexec"
+
+  tasks:
+    - name: Partition the volume if not already partitioned
+      command: "echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}"
+      args:
+        warn: false
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
+      register: partition_result
+      failed_when: "'already contains a partition table' not in partition_result.stdout"
+      changed_when: "'already contains a partition table' not in partition_result.stdout"
+
+    - name: Format the volume if not already formatted
+      filesystem:
+        dev: "{{ item.device }}1"
+        fstype: "{{ item.filesystem }}"
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
+
+    - name: Create mount point directory
+      file:
+        path: "{{ item.mount_point }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      with_items: "{{ volumes }}"
+
+    - name: Mount the volume
+      mount:
+        path: "{{ item.mount_point }}"
+        src: "{{ item.device }}1"
+        fstype: "{{ item.filesystem }}"
+        opts: "{{ item.opts }}"
+        state: mounted
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
+
+    - name: Persist the mount in /etc/fstab
+      blockinfile:
+        path: /etc/fstab
+        block: |
+          {{ item.device }}1 {{ item.mount_point }} {{ item.filesystem }} {{ item.opts }} 0 2
+      when: item.filesystem != "tmpfs"
+      with_items: "{{ volumes }}"
