@@ -4,13 +4,13 @@
   become: yes
   tasks:
     - name: Update packages and install OpenSCAP
-      import_playbook: init.yaml
+      import_tasks: init.yaml
 
     - name: Apply remediation
-      import_playbook: remediate.yaml
+      import_tasks: remediate.yaml
 
     - name: Apply SCAP remediation
-      import_playbook: remediate-scap.yaml
+      import_tasks: remediate-scap.yaml
 
     - name: Generate the report
-      import_playbook: generate-report.yaml
+      import_tasks: generate-report.yaml
