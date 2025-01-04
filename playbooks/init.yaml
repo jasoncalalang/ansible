@@ -38,3 +38,20 @@
           - openscap-scanner
           - scap-security-guide
         state: present
+
+    # -------------------------------------------------------------------------
+    #  AUTHSELECT TASKS: ensure authselect is installed and force the 'sssd' profile
+    # -------------------------------------------------------------------------
+    - name: Install authselect (if not present)
+      ansible.builtin.yum:
+        name: authselect
+        state: present
+
+    - name: Force authselect to manage PAM using the 'sssd' profile
+      ansible.builtin.command: authselect select sssd --force
+      register: result_authselect_select
+      changed_when: "'No modifications are required' not in result_authselect_select.stdout"
+
+    - name: Apply authselect changes
+      ansible.builtin.command: authselect apply-changes
+      when: result_authselect_select.changed
