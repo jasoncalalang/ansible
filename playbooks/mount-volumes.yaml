@@ -1,17 +1,9 @@
 ---
-- name: Partition, format, and mount disks
+- name: Partition, format, and mount disks starting from vdd
   hosts: all
   become: yes
   vars:
     volumes:
-      - device: "/dev/vdb"
-        mount_point: "/home"
-        filesystem: "ext4"
-        opts: "defaults,nodev"
-      - device: "/dev/vdc"
-        mount_point: "/tmp"
-        filesystem: "ext4"
-        opts: "defaults,nodev,nosuid,noexec"
       - device: "/dev/vdd"
         mount_point: "/var"
         filesystem: "ext4"
