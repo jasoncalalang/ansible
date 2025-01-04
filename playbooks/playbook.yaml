@@ -1,19 +1,6 @@
 ---
-- name: Master playbook to chain multiple playbooks
-  hosts: all
-  become: yes
-  tasks:
-    - name: Mount volumes
-      import_playbook: mount-volumes.yaml
-
-    - name: Update packages and install OpenSCAP
-      import_playbook: init.yaml
-    
-    # - name: Apply remediation
-    #   import_tasks: remediate.yaml
-
-    # - name: Apply SCAP remediation
-    #   import_tasks: remediate-scap.yaml
-
-    # - name: Generate the report
-    #   import_tasks: generate-report.yaml
+- import_playbook: mount-volumes.yaml
+- import_playbook: init.yaml
+# - import_playbook: remediate.yaml
+# - import_playbook: remediate-scap.yaml
+# - import_playbook: generate-report.yaml
