@@ -45,12 +45,22 @@
       register: grub2pw
       # no_log: true
 
-    - name: Configure grub2 user and password
-      lineinfile:
+    # Add this task after generating the password hash
+    - name: Configure GRUB user and password in grub.cfg
+      blockinfile:
+        path: "{{ grub_cfg_path }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - GRUB2 USER"
+        block: |
+          set superusers="admin"
+          password_pbkdf2 admin {{ grub2pw.stdout_lines[-1] }}
+      owner: root
+      group: root
+      mode: '0600'
+
+    # Ensure proper permissions on both user.cfg and grub.cfg
+    - name: Set permissions on user.cfg
+      file:
         path: /boot/grub2/user.cfg
-        regexp: '^GRUB2_PASSWORD='
-        line: "GRUB2_PASSWORD={{ grub2pw.stdout_lines[-1] }}"
-        create: yes
         owner: root
         group: root
         mode: '0600'
