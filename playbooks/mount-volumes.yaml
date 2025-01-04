@@ -28,7 +28,7 @@
   tasks:
     - name: Check if device is already partitioned
       command: "lsblk -n -o NAME {{ item.device | basename }}1"
-      register: check_partition
+      register: partition_check
       failed_when: false
       changed_when: false
       with_items: "{{ volumes }}"
@@ -39,10 +39,12 @@
         echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}
       args:
         executable: /bin/bash
-      when: item.filesystem != "tmpfs" and "1" not in check_partition.results[item.index].stdout
+      when: 
+        - item.filesystem != "tmpfs"
+        - "'1' not in partition_check.results[loop.index0].stdout"
       with_items: "{{ volumes }}"
       loop_control:
-        index_var: index
+        label: "{{ item.device }}"
 
     - name: Format the volume if not already formatted
       filesystem:
