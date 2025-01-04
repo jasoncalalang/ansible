@@ -41,10 +41,8 @@
         executable: /bin/bash
       when: 
         - item.filesystem != "tmpfs"
-        - "'1' not in partition_check.results[loop.index0].stdout"
+        - "'1' not in (partition_check.results | selectattr('item', 'equalto', item) | map(attribute='stdout') | list | first | default(''))"
       with_items: "{{ volumes }}"
-      loop_control:
-        label: "{{ item.device }}"
 
     - name: Format the volume if not already formatted
       filesystem:
