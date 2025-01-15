@@ -12,7 +12,6 @@
         name: user1
         shell: /bin/bash
         groups: wheel
-        # Replace the hash below with one you generate for P@ssw0rd@IBM
         password: "$6$ThiIK8enApAcAI6P$PVAjhaAF9OUPNZx6/8YopsKeWf5V4rpNOTLlNocre2xkDrfvxCHAac/VFoMmi4wiV9IXWa5sh70FEBS/99.ky/"
         state: present
         create_home: yes
@@ -31,8 +30,15 @@
         dest: /home/user1/.ssh/authorized_keys
         owner: user1
         group: user1
-        mode: '0600'    
-
+        mode: '0600'
+    
+    - name: Copy private key to user1's .ssh directory
+      ansible.builtin.copy:
+      src: /root/.ssh/id_rsa
+      dest: /home/user1/.ssh/id_rsa
+      owner: user1
+      group: user1
+      mode: '0600'
 
     - name: Install OpenSCAP and SCAP Security Guide
       ansible.builtin.dnf:
