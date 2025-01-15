@@ -5,9 +5,40 @@
   vars:
     volumes:
       - device: "/dev/vdd"
+        partition: "1"
         mount_point: "/home"
         filesystem: "ext4"
         opts: "defaults,nodev"
+      - device: "/dev/vdd"
+        partition: "2"
+        mount_point: "/tmp"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdd"
+        partition: "3"
+        mount_point: "/var"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdd"
+        partition: "4"
+        mount_point: "/var/log"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdd"
+        partition: "5"
+        mount_point: "/var/log/audit"
+        filesystem: "ext4"
+        opts: "defaults"
+      - device: "/dev/vdd"
+        partition: "6"
+        mount_point: "/var/tmp"
+        filesystem: "ext4"
+        opts: "defaults,nodev,nosuid,noexec"
+      - device: "/dev/vdd"
+        partition: "7"
+        mount_point: "/dev/shm"
+        filesystem: "tmpfs"
+        opts: "defaults,nodev,nosuid,noexec"
 
   tasks:
     - name: Ensure the mount point directory exists
@@ -19,9 +50,9 @@
         mode: "0755"
       with_items: "{{ volumes }}"
 
-    - name: Create a partition if not already partitioned
+    - name: Create partitions if not already partitioned
       shell: |
-        echo -e 'o\nn\np\n1\n\n\nw' | fdisk {{ item.device }}
+        (echo n; echo p; echo {{ item.partition }}; echo ; echo +10G; echo w) | fdisk {{ item.device }}
       args:
         executable: /bin/bash
       when: item.filesystem != "tmpfs"
@@ -31,7 +62,7 @@
 
     - name: Format the partition if not already formatted
       filesystem:
-        dev: "{{ item.device }}1"
+        dev: "{{ item.device }}{{ item.partition }}"
         fstype: "{{ item.filesystem }}"
       when: item.filesystem != "tmpfs"
       with_items: "{{ volumes }}"
@@ -41,7 +72,7 @@
     - name: Mount the volume (force overwrite existing mount point)
       mount:
         path: "{{ item.mount_point }}"
-        src: "{{ item.device }}1"
+        src: "{{ item.device }}{{ item.partition }}"
         fstype: "{{ item.filesystem }}"
         opts: "{{ item.opts }}"
         state: mounted
