@@ -1,7 +1,7 @@
 ---
 - name: Prepare and mount volumes
   hosts: all
-  become: yes
+  become: true
   vars:
     volumes:
       - device: "/dev/vdd"
