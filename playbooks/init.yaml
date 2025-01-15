@@ -7,6 +7,7 @@
       ansible.builtin.dnf:
         name: "*"
         state: latest
+
     - name: Create a non-root user with sudo privileges
       ansible.builtin.user:
         name: user1
@@ -34,11 +35,11 @@
     
     - name: Copy private key to user1's .ssh directory
       ansible.builtin.copy:
-      src: /root/.ssh/id_rsa
-      dest: /home/user1/.ssh/id_rsa
-      owner: user1
-      group: user1
-      mode: '0600'
+        src: /root/.ssh/id_rsa
+        dest: /home/user1/.ssh/id_rsa
+        owner: user1
+        group: user1
+        mode: '0600'
 
     - name: Install OpenSCAP and SCAP Security Guide
       ansible.builtin.dnf:
@@ -56,10 +57,12 @@
         state: present
 
     - name: Force authselect to manage PAM using the 'sssd' profile
-      ansible.builtin.command: authselect select sssd --force
+      ansible.builtin.command: 
+        cmd: authselect select sssd --force
       register: result_authselect_select
       changed_when: "'No modifications are required' not in result_authselect_select.stdout"
 
     - name: Apply authselect changes
-      ansible.builtin.command: authselect apply-changes
+      ansible.builtin.command: 
+        cmd: authselect apply-changes
       when: result_authselect_select.changed
