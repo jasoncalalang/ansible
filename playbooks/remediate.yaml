@@ -1736,7 +1736,7 @@
     - name: Check if authselect is installed
       command: rpm -q authselect
       register: result_authselect_installed
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Enable authselect - Informative Message Based on authselect Integrity Check 
       ansible.builtin.assert:
