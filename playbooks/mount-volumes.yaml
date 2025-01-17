@@ -13,7 +13,7 @@
         partition: "2"
         mount_point: "/tmp"
         filesystem: "ext4"
-        opts: "defaults"
+        opts: "defaults,nosuid,noexec"
       - device: "/dev/vdd"
         partition: "3"
         mount_point: "/var"
@@ -28,46 +28,42 @@
         partition: "5"
         mount_point: "/var/log/audit"
         filesystem: "ext4"
-        opts: "defaults"
+        opts: "defaults,nodev"
       - device: "/dev/vdd"
         partition: "6"
         mount_point: "/var/tmp"
         filesystem: "ext4"
         opts: "defaults,nodev,nosuid,noexec"
-      - device: "/dev/vdd"
-        partition: "7"
+      - device: "none"
+        partition: ""
         mount_point: "/dev/shm"
         filesystem: "tmpfs"
         opts: "defaults,nodev,nosuid,noexec"
 
   tasks:
-    - name: Ensure the mount point directory exists
-      file:
-        path: "{{ item.mount_point }}"
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
+    - name: Create GPT partition table
+      shell: parted {{ item.device }} --script mklabel gpt
+      when: item.partition == "1"
       with_items: "{{ volumes }}"
-
-    - name: Create partitions if not already partitioned
-      shell: |
-        (echo n; echo p; echo {{ item.partition }}; echo ; echo +10G; echo w) | fdisk {{ item.device }}
+    
+    - name: Create partitions with GPT
+      shell: parted {{ item.device }} --script mkpart primary ext4 {{ item.start }} {{ item.end }}
       args:
-        executable: /bin/bash
-      when: item.filesystem != "tmpfs"
-      with_items: "{{ volumes }}"
-      register: partition_result
-      failed_when: false
+        creates: "{{ item.device }}{{ item.partition }}"
+      with_items:
+        - { device: "/dev/vdd", partition: "1", start: "1MiB", end: "10GiB" }
+        - { device: "/dev/vdd", partition: "2", start: "10GiB", end: "20GiB" }
+        - { device: "/dev/vdd", partition: "3", start: "20GiB", end: "30GiB" }
+        - { device: "/dev/vdd", partition: "4", start: "30GiB", end: "40GiB" }
+        - { device: "/dev/vdd", partition: "5", start: "40GiB", end: "50GiB" }
+        - { device: "/dev/vdd", partition: "6", start: "50GiB", end: "60GiB" }
 
     - name: Format the partition if not already formatted
       filesystem:
         dev: "{{ item.device }}{{ item.partition }}"
         fstype: "{{ item.filesystem }}"
-      when: item.filesystem != "tmpfs"
       with_items: "{{ volumes }}"
-      register: format_result
-      failed_when: false
+      when: item.filesystem != "tmpfs"
 
     - name: Mount the volume (force overwrite existing mount point)
       mount:
@@ -77,3 +73,11 @@
         opts: "{{ item.opts }}"
         state: mounted
       with_items: "{{ volumes }}"
+
+    - name: Mount tmpfs for /dev/shm
+      mount:
+        path: "/dev/shm"
+        src: "tmpfs"
+        fstype: "tmpfs"
+        opts: "defaults,nodev,nosuid,noexec"
+        state: mounted
