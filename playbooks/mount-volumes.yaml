@@ -41,11 +41,18 @@
         opts: "defaults,nodev,nosuid,noexec"
 
   tasks:
+    - name: Ensure parted and e2fsprogs are installed
+      package:
+        name:
+          - parted
+          - e2fsprogs
+        state: present
+
     - name: Create GPT partition table
       shell: parted {{ item.device }} --script mklabel gpt
       when: item.partition == "1"
       with_items: "{{ volumes }}"
-    
+
     - name: Create partitions with GPT
       shell: parted {{ item.device }} --script mkpart primary ext4 {{ item.start }} {{ item.end }}
       args:
